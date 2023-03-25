@@ -1,0 +1,7 @@
+# Godot-specific
+.godot/
+*.import
+export_presets.cfg
+
+# VSCode-specific
+.vscode/
