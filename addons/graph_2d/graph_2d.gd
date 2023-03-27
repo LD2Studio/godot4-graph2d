@@ -220,19 +220,18 @@ func update_graph() -> void:
 	get_node("PlotArea").offset_bottom = -margin_bottom
 	
 	# Vertical Graduation
-	
 	var y_step = _get_min_step(y_min, y_max)
 	assert(not is_inf(y_step), "y_step is infinite!")
 
 	var y_axis_range: float = y_max - y_min
-	var vert_grad_number = _get_graduation_num(y_min, y_max, y_step)
+	var vert_grad_number = _get_graduation_num(y_min, y_max, y_step, "vert")
 	
 	# Horizontal Graduation
 	var x_step = _get_min_step(x_min, x_max)
 	assert(not is_inf(x_step), "y_step is infinite!")
 	
 	var x_axis_range: float = x_max - x_min
-	var hor_grad_number = _get_graduation_num(x_min, x_max, x_step)
+	var hor_grad_number = _get_graduation_num(x_min, x_max, x_step, "hor")
 	
 	# Plot area height in pixel
 	var area_height = size.y - MARGIN_TOP - margin_bottom
@@ -318,20 +317,27 @@ func _on_Graph_resized() -> void:
 func _on_plot_area_resized() -> void:
 	update_plots()
 
+## This function return the minimal step
 func _get_min_step(value_min, value_max):
-#	print("min: %f , max: %f , interval: %f" % [value_min, value_max, value_max - value_min])
 	var range_log: int = int(log10(value_max - value_min))
 #	print("range log: ", range_log)
 	var step: float = 10.0**(range_log-1)
 #	print("min step: %f " % [step])
 	return step
-	
 
-func _get_graduation_num(value_min, value_max, step) -> int:
+func _get_graduation_num(value_min, value_max, step, orientation) -> int:
 	var diff = value_max - value_min
 	var nb_grad: int = roundi(diff/step)
-
-	while nb_grad > 10:
+	var max_grad_num: int
+	match orientation:
+		"vert":
+			if size.y < 250: max_grad_num = 5
+			else: max_grad_num = 10
+		"hor":
+			if size.x < 450: max_grad_num = 5
+			else: max_grad_num = 10
+	
+	while nb_grad > max_grad_num:
 #		print("->", nb_grad)
 		if not nb_grad % 2:
 			nb_grad /= 2
