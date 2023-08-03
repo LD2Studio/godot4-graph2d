@@ -77,12 +77,11 @@ const MARGIN_LEFT = 45
 const MARGIN_RIGHT = 30
 
 const Graph2DAxis = preload("res://addons/graph_2d/custom_nodes/axis.gd")
-const Graph2DCoord = preload("res://addons/graph_2d/custom_nodes/coordinate.gd")
 const Graph2DGrid = preload("res://addons/graph_2d/custom_nodes/grid.gd")
 const Graph2DLegend = preload("res://addons/graph_2d/custom_nodes/legend.gd")
 
 var plots: Array
-
+var mouse_coords: Vector2
 var x_step: float
 var y_step: float
 
@@ -158,9 +157,7 @@ func _ready():
 	
 	var legend = Graph2DLegend.new()
 	plot_area.add_child(legend)
-	
-	var coordinate = Graph2DCoord.new()
-	plot_area.add_child(coordinate)
+
 	
 	resized.connect(_on_Graph_resized)
 	plot_area.resized.connect(_on_plot_area_resized)
@@ -180,7 +177,7 @@ func _input(event: InputEvent) -> void:
 		if plot_rect.has_point(get_node("PlotArea").get_local_mouse_position()):
 			var pos: Vector2i = get_node("PlotArea").get_local_mouse_position()
 			var point = pixel_to_coordinate(pos)
-			get_node("PlotArea/Coordinate").text = "(%.3f, %.3f)" % [point.x, point.y]
+			mouse_coords = Vector2(point.x, point.y)
 
 ## Add plot in Graph2D and return an instance of plot
 func add_plot_item(label = "", color = Color.WHITE, width = 1.0) -> PlotItem:
@@ -423,6 +420,9 @@ func get_max_value(min_value, max_value, step):
 		if nb_grad <= 10:
 			return max_token
 		max_token += step
-		
+
+func get_mouse_coords() -> Vector2:
+	return cursor_coords
+
 func log10(value: float) -> float:
 	return log(value)/log(10)
