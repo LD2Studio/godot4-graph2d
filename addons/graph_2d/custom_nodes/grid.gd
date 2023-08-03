@@ -11,8 +11,8 @@ func _ready():
 
 func _draw() -> void:
 	for line in hor_grid:
-		draw_line(line[0], line[1], grid_vertical_color)
+		draw_line(line[0], line[1], grid_horizontal_color)
 		
 	for line in vert_grid:
-		draw_line(line[0], line[1], grid_horizontal_color)
+		draw_line(line[0], line[1], grid_vertical_color)
 
