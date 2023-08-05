@@ -26,6 +26,21 @@ class_name Graph2D
 		x_label = value
 		update_graph()
 
+@export var show_x_ticks: bool = true:
+	set(value):
+		show_x_ticks = value
+		update_graph()
+
+@export var show_x_numbers: bool = true:
+	set(value):
+		show_x_numbers = value
+		update_graph()
+
+@export var show_horizontal_line: bool = true:
+	set(value):
+		show_horizontal_line = value
+		update_graph()
+
 @export_group("Y Axis")
 ## Minimun value on Y-axis
 @export var y_min = 0.0:
@@ -52,6 +67,21 @@ class_name Graph2D
 	set(value):
 		y_label = value
 		update_graph()
+
+@export var show_y_ticks: bool = true:
+	set(value):
+		show_y_ticks = value
+		update_graph()
+
+@export var show_y_numbers: bool = true:
+	set(value):
+		show_y_numbers = value
+		update_graph()
+
+@export var show_vertical_line: bool = true:
+	set(value):
+		show_vertical_line = value
+		update_graph()
 		
 @export_group("Background")
 ## background color of graph
@@ -66,9 +96,19 @@ class_name Graph2D
 		grid_horizontal_visible = value
 		update_graph()
 
+@export var grid_horizontal_color: Color = Color(1,1,1,0.3):
+	set(value):
+		grid_horizontal_color = value
+		update_graph()
+
 @export var grid_vertical_visible = false:
 	set(value):
 		grid_vertical_visible = value
+		update_graph()
+
+@export var grid_vertical_color: Color = Color(1,1,1,0.3):
+	set(value):
+		grid_vertical_color = value
 		update_graph()
 
 const MARGIN_TOP = 30
@@ -213,6 +253,14 @@ func update_graph() -> void:
 	# Update margins depend of axis labels
 	get_node("Axis").x_label = x_label
 	get_node("Axis").y_label = y_label
+	get_node("Axis").show_x_ticks = show_x_ticks
+	get_node("Axis").show_x_numbers = show_x_numbers
+	get_node("Axis").show_horizontal_line = show_horizontal_line
+	get_node("Axis").show_y_ticks = show_y_ticks
+	get_node("Axis").show_y_numbers = show_y_numbers
+	get_node("Axis").show_vertical_line = show_vertical_line
+	get_node("Grid").grid_horizontal_color = grid_horizontal_color
+	get_node("Grid").grid_vertical_color= grid_vertical_color
 	var margin_left: float = MARGIN_LEFT if get_node("Axis").y_label == "" else MARGIN_LEFT + 20
 	var margin_bottom: float = MARGIN_BOTTOM if get_node("Axis").x_label == "" else MARGIN_BOTTOM + 20
 	
