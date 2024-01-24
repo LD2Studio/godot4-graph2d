@@ -150,7 +150,18 @@ class PlotItem:
 		pt_px.y = remap(point.y, graph.y_min, graph.y_max, graph.get_node("PlotArea").size.y, 0)
 		curve.points_px.append(pt_px)
 		curve.queue_redraw()
-		
+	
+	func remove_point(pt: Vector2):
+		if points.find(pt) == -1:
+			printerr("No point found with the coordinates of %s" % str(pt))
+		points.remove_at(points.find(pt))
+		var point = pt.clamp(Vector2(graph.x_min, graph.y_min), Vector2(graph.x_max, graph.y_max))
+		var pt_px: Vector2
+		pt_px.x = remap(point.x, graph.x_min, graph.x_max, 0, graph.get_node("PlotArea").size.x)
+		pt_px.y = remap(point.y, graph.y_min, graph.y_max, graph.get_node("PlotArea").size.y, 0)
+		curve.points_px.remove_at(curve.points_px.find(pt_px))
+		curve.queue_redraw()
+	
 	func clear():
 		points.clear()
 		curve.points_px.clear()
