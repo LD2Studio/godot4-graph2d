@@ -247,7 +247,7 @@ func remove_plot_item(plot: PlotItem):
 	plot.clear()
 	plot.curve.queue_free()
 	# unreference plot object
-	plot.unreference()
+	plot.call_deferred('unreference')
 	update_legend()
 
 func pixel_to_coordinate(px: Vector2i) -> Vector2:
