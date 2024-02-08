@@ -127,7 +127,7 @@ var x_step: float
 var y_step: float
 
 
-class PlotItem:
+class PlotItem extends RefCounted:
 	var curve: LinePlot
 	var points: PackedVector2Array
 	var graph: Graph2D
@@ -244,7 +244,8 @@ func remove_plot_item(plot: PlotItem):
 	# remove from plot_list
 	var new_plot_list = plots.filter(func(p): return p!=plot)
 	plots = new_plot_list
-	plot.clear()
+	
+	get_node("PlotArea").remove_child(plot.curve)
 	plot.curve.queue_free()
 	# unreference plot object
 	plot.call_deferred('unreference')

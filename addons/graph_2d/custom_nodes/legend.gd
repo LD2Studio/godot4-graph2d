@@ -12,6 +12,7 @@ func _ready():
 func update(labels):
 	for child in layout.get_children():
 		layout.remove_child(child)
+		child.queue_free()
 		
 	for label in labels:
 		var l = Label.new()
