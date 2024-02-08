@@ -27,3 +27,22 @@ y_label = "Y"
 background_color = Color(0.0941176, 0.227451, 0.4, 1)
 grid_horizontal_visible = true
 grid_vertical_visible = true
+
+[node name="AddPlot" type="Button" parent="."]
+layout_mode = 0
+offset_left = 280.0
+offset_top = 32.0
+offset_right = 393.0
+offset_bottom = 63.0
+text = "Add New Plot"
+
+[node name="RemoveAllPlots" type="Button" parent="."]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 32.0
+offset_right = 537.0
+offset_bottom = 63.0
+text = "Remove All Plots"
+
+[connection signal="pressed" from="AddPlot" to="." method="_on_add_plot_pressed"]
+[connection signal="pressed" from="RemoveAllPlots" to="." method="_on_remove_all_plots_pressed"]

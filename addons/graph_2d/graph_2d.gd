@@ -251,6 +251,12 @@ func remove_plot_item(plot: PlotItem):
 	plot.call_deferred('unreference')
 	update_legend()
 
+
+func remove_all() -> void:
+	for p:PlotItem in plots:
+		remove_plot_item(p)
+
+
 func pixel_to_coordinate(px: Vector2i) -> Vector2:
 	var point: Vector2
 	point.x = remap(px.x, 0, get_node("PlotArea").size.x, x_min, x_max)
