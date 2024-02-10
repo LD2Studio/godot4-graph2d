@@ -12,12 +12,11 @@ This repository contains the add-on and examples.
 - Real-time plotting.
 - Works with all renderers.
 - Works on desktop platforms and HTML5 (others target were not tested).
+- Documentation included with the plugin.
 
 ## Usage
 
 ### Single plot
-- Create a new scene with a `Control` type as root node.
-    - Attach a script to your root node.
 - Add a `Graph2D` node as a child of the root node. Adapt its size to the control.
 
 ![Alt text](screenshots/single_plot_scenetree.png)
@@ -27,13 +26,13 @@ This repository contains the add-on and examples.
 - Create a new plot using the method `Graph2D.add_plot_item()` from your script. The arguments are in order the name of the plot, its color and finally the thickness of the line.
     - Note: This method will return an `Graph2D.PlotItem` object which will then be used to reference the plot and update its points.
 
-```js
+```gdscript
 func _ready() -> void:
 	var my_plot: Graph2D.PlotItem = $Graph2D.add_plot_item("My Plot", Color.GREEN, 1.0)
 ```
 - Add point with `Graph2D.PlotItem.add_point(Vector coord)` method.
 
-```js
+```gdscript
 for x in range(0, 11, 1):
 	var y = randf_range(0, 1)
 	my_plot.add_point(Vector2(x, y))
@@ -56,7 +55,7 @@ You can view on the top right of the graphic the coordinates of the plot pointed
 
 ## License
 
-Copyright © 2023 Laurent Dethoor
+Copyright © 2023-2024 Laurent Dethoor
 
 Unless otherwise specified, files in this repository are licensed under the
 MIT license. See [LICENSE.md](LICENSE.md) for more information.

@@ -1,8 +1,11 @@
 extends Control
 
 func _on_add_plot_pressed() -> void:
-	var my_plot = $Graph2D.add_plot_item("Plot %d" % [$Graph2D.plots.size()],
-		[Color.RED, Color.GREEN, Color.BLUE][$Graph2D.plots.size() % 3], 1.0)
+	var my_plot = $Graph2D.add_plot_item(
+			"Plot %d" % [$Graph2D.count()],
+			[Color.RED, Color.GREEN, Color.BLUE][$Graph2D.count() % 3],
+			[1.0, 3.0, 5.0].pick_random()
+			)
 
 	for x in range(0, 11, 1):
 		var y = randf_range(-50, 50)
