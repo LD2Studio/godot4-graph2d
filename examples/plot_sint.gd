@@ -23,11 +23,11 @@ func _process(_delta):
 
 func _on_draw_button_pressed() -> void:
 	draw_enabled = true
-	plot_sin.clear()
+	plot_sin.remove_all()
 	x = 0.0
 
 
 func _on_clear_button_pressed() -> void:
 	draw_enabled = false
-	plot_sin.clear()
+	plot_sin.remove_all()
 	x = 0.0

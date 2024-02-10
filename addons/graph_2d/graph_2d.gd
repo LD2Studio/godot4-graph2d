@@ -1,186 +1,142 @@
 @tool
-@icon("res://addons/graph_2d/graph_2d.svg")
-extends Control
 class_name Graph2D
+extends Control
+## A graph for representing data on a two-dimensional axis system as plots
+##
+## Graph2D allows you to create and display several plots simultaneously.[br][br]
+## To add a new plot, call the [method add_plot_item]. It returns an object of type [PlotItem].[br]
+## To add points to the plot, call the [method PlotItem.add_point].
+
+#region Export variables
 
 @export_group("X Axis")
 ## Minimun value on X-axis
 @export var x_min: float = 0.0:
 	set(value):
 		if value < x_max:
-			x_step = _get_min_step(value, x_max)
-			x_min = get_min_value(value, x_max, x_step)
-			update_graph()
-			update_plots()
+			_x_step = _get_min_step(value, x_max)
+			x_min = _get_min_value(value, x_max, _x_step)
+			_update_graph()
+			_update_plots()
 ## Maximum value on X-axis
 @export var x_max: float = 10.0:
 	set(value):
 		if value > x_min:
-			x_step = _get_min_step(x_min, value)
-			x_max = get_max_value(x_min, value, x_step)
-			update_graph()
-			update_plots()
-
+			_x_step = _get_min_step(x_min, value)
+			x_max = _get_max_value(x_min, value, _x_step)
+			_update_graph()
+			_update_plots()
+## Label of X-axis
 @export var x_label: String = "":
 	set(value):
 		x_label = value
-		update_graph()
-
+		_update_graph()
+## Shows ticks on the X-axis
 @export var show_x_ticks: bool = true:
 	set(value):
 		show_x_ticks = value
-		update_graph()
-
+		_update_graph()
+## Shows numbers on the X-axis
 @export var show_x_numbers: bool = true:
 	set(value):
 		show_x_numbers = value
-		update_graph()
-
+		_update_graph()
+## Shows line on the X-axis
 @export var show_horizontal_line: bool = true:
 	set(value):
 		show_horizontal_line = value
-		update_graph()
+		_update_graph()
 
 @export_group("Y Axis")
 ## Minimun value on Y-axis
 @export var y_min = 0.0:
 	set(value):
 		if value < y_max:
-			y_step = _get_min_step(value, y_max)
+			_y_step = _get_min_step(value, y_max)
 #			print_debug("y step: ", y_step)
-			y_min = get_min_value(value, y_max, y_step)
+			y_min = _get_min_value(value, y_max, _y_step)
 #			print_debug("y_min: ", y_min)
-			update_graph()
-			update_plots()
+			_update_graph()
+			_update_plots()
 ## Maximum value on Y-axis
 @export var y_max = 1.0:
 	set(value):
 		if value > y_min:
-			y_step = _get_min_step(y_min, value)
-			y_max = get_max_value(y_min, value, y_step)
+			_y_step = _get_min_step(y_min, value)
+			y_max = _get_max_value(y_min, value, _y_step)
 #			print_debug("y_max: ", y_max)
-			update_graph()
-			update_plots()
+			_update_graph()
+			_update_plots()
 
-## Y-axis label
+## Lable of Y-axis
 @export var y_label: String = "":
 	set(value):
 		y_label = value
-		update_graph()
-
+		_update_graph()
+## Shows ticks on the Y-axis
 @export var show_y_ticks: bool = true:
 	set(value):
 		show_y_ticks = value
-		update_graph()
-
+		_update_graph()
+## Shows numbers on the Y-axis
 @export var show_y_numbers: bool = true:
 	set(value):
 		show_y_numbers = value
-		update_graph()
-
+		_update_graph()
+## Shows line of the Y-axis
 @export var show_vertical_line: bool = true:
 	set(value):
 		show_vertical_line = value
-		update_graph()
+		_update_graph()
 		
 @export_group("Background")
-## background color of graph
+## Background color of graph
 @export var background_color = Color.BLACK:
 	set(value):
 		background_color = value
 		if get_node_or_null("Background"):
 			get_node("Background").color = background_color
-## Grid visibility
+## Shows horizontal grid
 @export var grid_horizontal_visible = false:
 	set(value):
 		grid_horizontal_visible = value
-		update_graph()
-
+		_update_graph()
+## Horizontal grid color
 @export var grid_horizontal_color: Color = Color(1,1,1,0.3):
 	set(value):
 		grid_horizontal_color = value
-		update_graph()
-
+		_update_graph()
+## Shows vertical grid
 @export var grid_vertical_visible = false:
 	set(value):
 		grid_vertical_visible = value
-		update_graph()
-
+		_update_graph()
+## Vertical grid color
 @export var grid_vertical_color: Color = Color(1,1,1,0.3):
 	set(value):
 		grid_vertical_color = value
-		update_graph()
+		_update_graph()
 
-const MARGIN_TOP = 30
-const MARGIN_BOTTOM = 30
-const MARGIN_LEFT = 45
-const MARGIN_RIGHT = 30
+#endregion
 
-const Graph2DAxis = preload("res://addons/graph_2d/custom_nodes/axis.gd")
-const Graph2DCoord = preload("res://addons/graph_2d/custom_nodes/coordinate.gd")
-const Graph2DGrid = preload("res://addons/graph_2d/custom_nodes/grid.gd")
-const Graph2DLegend = preload("res://addons/graph_2d/custom_nodes/legend.gd")
+#region Private variables
 
-var plots: Array
+const _MARGIN_TOP = 30
+const _MARGIN_BOTTOM = 30
+const _MARGIN_LEFT = 45
+const _MARGIN_RIGHT = 30
 
-var x_step: float
-var y_step: float
+const _Graph2DAxis = preload("res://addons/graph_2d/custom_nodes/axis.gd")
+const _Graph2DCoord = preload("res://addons/graph_2d/custom_nodes/coordinate.gd")
+const _Graph2DGrid = preload("res://addons/graph_2d/custom_nodes/grid.gd")
+const _Graph2DLegend = preload("res://addons/graph_2d/custom_nodes/legend.gd")
 
+var _plots: Array
 
-class PlotItem:
-	var curve: LinePlot
-	var points: PackedVector2Array
-	var graph: Graph2D
-	var label: String
-	
-	func _init(obj, l, c, w):
-		curve = LinePlot.new()
-		graph = obj
-		label = l
-		curve.name = l
-		curve.color = c
-		curve.width = w
-		graph.get_node("PlotArea").add_child(curve)
-		
-	func add_point(pt: Vector2):
-		points.append(pt)
-		var point = pt.clamp(Vector2(graph.x_min, graph.y_min), Vector2(graph.x_max, graph.y_max))
-		var pt_px: Vector2
-		pt_px.x = remap(point.x, graph.x_min, graph.x_max, 0, graph.get_node("PlotArea").size.x)
-		pt_px.y = remap(point.y, graph.y_min, graph.y_max, graph.get_node("PlotArea").size.y, 0)
-		curve.points_px.append(pt_px)
-		curve.queue_redraw()
-	
-	func remove_point(pt: Vector2):
-		if points.find(pt) == -1:
-			printerr("No point found with the coordinates of %s" % str(pt))
-		points.remove_at(points.find(pt))
-		var point = pt.clamp(Vector2(graph.x_min, graph.y_min), Vector2(graph.x_max, graph.y_max))
-		var pt_px: Vector2
-		pt_px.x = remap(point.x, graph.x_min, graph.x_max, 0, graph.get_node("PlotArea").size.x)
-		pt_px.y = remap(point.y, graph.y_min, graph.y_max, graph.get_node("PlotArea").size.y, 0)
-		curve.points_px.remove_at(curve.points_px.find(pt_px))
-		curve.queue_redraw()
-	
-	func clear():
-		points.clear()
-		curve.points_px.clear()
-		curve.queue_redraw()
-	
-	func redraw():
-		curve.points_px.clear()
-		for pt in points:
-#			print_debug("Plot redraw %s" % pt)
-			if pt.x > graph.x_max or pt.x < graph.x_min: continue
-			var point = pt.clamp(Vector2(graph.x_min, graph.y_min), Vector2(graph.x_max, graph.y_max))
-			var pt_px: Vector2
-			pt_px.x = remap(point.x, graph.x_min, graph.x_max, 0, graph.get_node("PlotArea").size.x)
-			pt_px.y = remap(point.y, graph.y_min, graph.y_max, graph.get_node("PlotArea").size.y, 0)
-			curve.points_px.append(pt_px)
-		curve.queue_redraw()
-		
-	func count() -> int:
-		return points.size()
+var _x_step: float
+var _y_step: float
+
+#endregion
 
 func _ready():
 	var background = ColorRect.new()
@@ -195,22 +151,22 @@ func _ready():
 	plot_area.name = "PlotArea"
 	plot_area.anchor_right = 1.0
 	plot_area.anchor_bottom = 1.0
-	plot_area.offset_left = MARGIN_LEFT
-	plot_area.offset_top = MARGIN_TOP
-	plot_area.offset_right = -MARGIN_RIGHT
-	plot_area.offset_bottom = -MARGIN_BOTTOM
+	plot_area.offset_left = _MARGIN_LEFT
+	plot_area.offset_top = _MARGIN_TOP
+	plot_area.offset_right = -_MARGIN_RIGHT
+	plot_area.offset_bottom = -_MARGIN_BOTTOM
 	add_child(plot_area)
 	
-	var axis = Graph2DAxis.new()
+	var axis = _Graph2DAxis.new()
 	add_child(axis)
 	
-	var grid = Graph2DGrid.new()
+	var grid = _Graph2DGrid.new()
 	add_child(grid)
 	
-	var legend = Graph2DLegend.new()
+	var legend = _Graph2DLegend.new()
 	plot_area.add_child(legend)
 	
-	var coordinate = Graph2DCoord.new()
+	var coordinate = _Graph2DCoord.new()
 	plot_area.add_child(coordinate)
 	
 	resized.connect(_on_Graph_resized)
@@ -221,7 +177,7 @@ func _ready():
 	move_child(plot_area, 0)
 	move_child(background, 0)
 	
-	update_graph()
+	_update_graph()
 
 func _input(event: InputEvent) -> void:
 
@@ -230,33 +186,42 @@ func _input(event: InputEvent) -> void:
 		
 		if plot_rect.has_point(get_node("PlotArea").get_local_mouse_position()):
 			var pos: Vector2i = get_node("PlotArea").get_local_mouse_position()
-			var point = pixel_to_coordinate(pos)
+			var point = _pixel_to_coordinate(pos)
 			get_node("PlotArea/Coordinate").text = "(%.3f, %.3f)" % [point.x, point.y]
 
-## Add plot in Graph2D and return an instance of plot
+## Add plot to the graph and return an instance of plot.
 func add_plot_item(label = "", color = Color.WHITE, width = 1.0) -> PlotItem:
 	var plot = PlotItem.new(self, label, color, width)
-	plots.append(plot)
-	update_legend()
+	_plots.append(plot)
+	_update_legend()
 	return plot
 
+## Remove plot from the graph.
 func remove_plot_item(plot: PlotItem):
 	# remove from plot_list
-	var new_plot_list = plots.filter(func(p): return p!=plot)
-	plots = new_plot_list
-	plot.clear()
-	plot.curve.queue_free()
-	# unreference plot object
-	plot.call_deferred('unreference')
-	update_legend()
+	var new_plot_list = _plots.filter(func(p): return p!=plot)
+	_plots = new_plot_list
 
-func pixel_to_coordinate(px: Vector2i) -> Vector2:
+	plot.delete()
+	_update_legend()
+
+## Remove all plots inside graph.
+func remove_all() -> void:
+	for p:PlotItem in _plots:
+		remove_plot_item(p)
+
+## Return number of plots
+func count() -> int:
+	return _plots.size()
+
+
+func _pixel_to_coordinate(px: Vector2i) -> Vector2:
 	var point: Vector2
 	point.x = remap(px.x, 0, get_node("PlotArea").size.x, x_min, x_max)
 	point.y = remap(px.y, 0, get_node("PlotArea").size.y, y_max, y_min)
 	return point
 
-func update_graph() -> void:
+func _update_graph() -> void:
 	if get_node_or_null("Axis") == null: return
 	if get_node_or_null("Grid") == null: return
 	if get_node_or_null("PlotArea") == null: return
@@ -272,8 +237,8 @@ func update_graph() -> void:
 	get_node("Axis").show_vertical_line = show_vertical_line
 	get_node("Grid").grid_horizontal_color = grid_horizontal_color
 	get_node("Grid").grid_vertical_color= grid_vertical_color
-	var margin_left: float = MARGIN_LEFT if get_node("Axis").y_label == "" else MARGIN_LEFT + 20
-	var margin_bottom: float = MARGIN_BOTTOM if get_node("Axis").x_label == "" else MARGIN_BOTTOM + 20
+	var margin_left: float = _MARGIN_LEFT if get_node("Axis").y_label == "" else _MARGIN_LEFT + 20
+	var margin_bottom: float = _MARGIN_BOTTOM if get_node("Axis").x_label == "" else _MARGIN_BOTTOM + 20
 	
 	get_node("PlotArea").offset_left = margin_left
 	get_node("PlotArea").offset_bottom = -margin_bottom
@@ -293,10 +258,10 @@ func update_graph() -> void:
 	var hor_grad_number = _get_graduation_num(x_min, x_max, x_step, "hor")
 	
 	# Plot area height in pixel
-	var area_height = size.y - MARGIN_TOP - margin_bottom
+	var area_height = size.y - _MARGIN_TOP - margin_bottom
 	var vert_grad_step_px = area_height / (vert_grad_number - 1)
 	# Plot area width in pixel
-	var area_width = size.x - margin_left - MARGIN_RIGHT
+	var area_width = size.x - margin_left - _MARGIN_RIGHT
 	var hor_grad_step_px = area_width / (hor_grad_number -1)
 	
 	var vert_grad: Array
@@ -306,7 +271,7 @@ func update_graph() -> void:
 	# Draw grid number
 	for n in range(vert_grad_number):
 		var grad: Array = []
-		grad_px.y = MARGIN_TOP + n * vert_grad_step_px
+		grad_px.y = _MARGIN_TOP + n * vert_grad_step_px
 		grad.append(grad_px)
 		var grad_text = "%0.1f" % (float(y_max) - n * float(y_axis_range)/(vert_grad_number-1))
 		grad.append(grad_text)
@@ -329,7 +294,7 @@ func update_graph() -> void:
 	var hor_grad: Array
 	var vert_grid: Array
 	grad_px = Vector2()
-	grad_px.y = MARGIN_TOP + area_height
+	grad_px.y = _MARGIN_TOP + area_height
 	
 	for n in range(hor_grad_number):
 		var grad: Array = []
@@ -356,30 +321,29 @@ func update_graph() -> void:
 	get_node("Axis").queue_redraw()
 	get_node("Grid").queue_redraw()
 	
-func update_plots():
-	for plot in plots:
-		plot.redraw()
+func _update_plots():
+	for plot in _plots:
+		plot._redraw()
 
-func update_legend() -> void:
+func _update_legend() -> void:
 	# Add labels to the legend
 	var labels = Array()
-	for p in plots:
+	for p in _plots:
 		labels.append({
 			name = p.label,
-			color = p.curve.color,
+			color = p.color,
 		})
 	get_node("PlotArea/Legend").update(labels)
 
 func _on_Graph_resized() -> void:
-	update_graph()
+	_update_graph()
 	
 func _on_plot_area_resized() -> void:
-	update_plots()
+	_update_plots()
 
-## This function return the minimal step
+# This function return the minimal step
 func _get_min_step(value_min, value_max):
-	var range_log: int = int(log10(value_max - value_min))
-#	print("range log: ", range_log)
+	var range_log: int = int(_log10(value_max - value_min))
 	var step: float = 10.0**(range_log-1)
 #	print("min step: %f " % [step])
 	return step
@@ -421,7 +385,7 @@ func _get_graduation_num(value_min, value_max, step, orientation) -> int:
 #	print("diff: %f , nb_grad: %d" % [diff, nb_grad])
 	return nb_grad + 1
 	
-func get_min_value(min_value, max_value, step):
+func _get_min_value(min_value, max_value, step):
 	var min_token = roundf(min_value/step) * step
 	
 	while true:
@@ -452,7 +416,7 @@ func get_min_value(min_value, max_value, step):
 			return min_token
 		min_token -= step
 	
-func get_max_value(min_value, max_value, step):
+func _get_max_value(min_value, max_value, step):
 	var max_token = roundf(max_value/step) * step
 	
 	while true:
@@ -483,5 +447,5 @@ func get_max_value(min_value, max_value, step):
 			return max_token
 		max_token += step
 		
-func log10(value: float) -> float:
+func _log10(value: float) -> float:
 	return log(value)/log(10)
